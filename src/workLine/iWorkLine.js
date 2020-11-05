@@ -3,24 +3,24 @@ const tools = require('../util/tools')
 const Rabbit = require('../util/rabbit')
 const { log4js } = require('../util/logger')
 
-const _workerName = Symbol('_workerName')
+const _workLineName = Symbol('_workLineName')
 const _mqAddress = Symbol('_mqAddress')
 const _queueName = Symbol('_queueName')
 const _connection = Symbol('_connection')
 const _log = Symbol('_log')
 class BaseWorkLine {
-  constructor({ address, workerName }) {
-    this[_workerName] = workerName
+  constructor({ address, workLineName }) {
+    this[_workLineName] = workLineName
     this[_mqAddress] = address
-    this[_log] = log4js.getLogger(workerName)
+    this[_log] = log4js.getLogger(workLineName)
   }
 
   get connection() {
     return this[_connection]
   }
 
-  get workerName() {
-    return this[_workerName]
+  get workLineName() {
+    return this[_workLineName]
   }
 
   get address() {
@@ -29,6 +29,14 @@ class BaseWorkLine {
 
   get queueName() {
     return this[_queueName]
+  }
+
+  get exportExchange() {
+    return null
+  }
+
+  get bindExchange() {
+    return null
   }
 
   get nextQueue() {
@@ -48,13 +56,28 @@ class BaseWorkLine {
     const log = this.log
     // amqp.connect(this.address, { clientProperties: { connection_name: this.hostName } })
     //   .then(cnn => cnn.createChannel())
-    new Rabbit({ address: this.address, hostName: this.workerName })
+    new Rabbit({ address: this.address, hostName: this.workLineName })
       .then(rabbit => {
         this[_connection] = rabbit.connection
         return rabbit.connection.createChannel()
       })
       .then(async channel => {
+        if (this.exportExchange) {
+          await channel.assertExchange(this.exportExchange, 'fanout', { durable: true })
+        }
+
         await channel.assertQueue(queueName, { durable: true }) // durable: 持久化
+          .then(async q => {
+            if (this.bindExchange) {
+              await channel.assertExchange(this.bindExchange, 'fanout', { durable: true })
+              await channel.bindQueue(q.queue, this.bindExchange, '')
+            }
+          })
+        // , (err, q) => {
+        // if (err) { throw err }
+        // this.log.debug(this.bindExchange)
+
+        // })
         await channel.prefetch(1) // 该 scheduler 一次只接收一个 msg，old msg ack 后，接收新的 task
         await this.beforeConsume()
         log.info(` [*] Waiting for messages in ${queueName}. To exit press CTRL+C`)
@@ -62,13 +85,13 @@ class BaseWorkLine {
           if (msg != null) {
             const taskId = tools.genUUID()
             log.time(taskId)
-            log.info(`${taskId} Recieve msg. Begin Process...`)
+            log.debug(`${taskId} Recieve msg. Begin Process...`)
             try {
               await this.doFeature(msg, channel, taskId)
             } catch (error) {
               await this.errorHandling(msg, channel, error, taskId)
             } finally {
-              log.info(`${taskId} Process Done.`)
+              log.debug(`${taskId} Process Done.`)
               log.timeEnd(taskId)
             }
           } else {

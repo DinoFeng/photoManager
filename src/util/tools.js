@@ -1,9 +1,14 @@
 const crypto = require('crypto')
 // const ExifImage = require('exif').ExifImage
 const exifParser = require('exif-parser')
+const uuidV1 = require('uuid').v1
 const fs = require('fs')
 
 const tools = {
+  genUUID() {
+    return uuidV1().replace(/-/g, '').toUpperCase()
+  },
+
   genCrypto(buffer, type) {
     const hash = crypto.createHash(type)
     hash.update(buffer)
@@ -91,7 +96,23 @@ const tools = {
       }
     }
     // 未能识别到该文件类型
-    return 'unknowed'
+    // return 'unknowed'
+    return null
+  },
+
+  getImageFileType(file) {
+    const buffer = fs.readFileSync(file)
+    return this.getImageType(buffer)
+  },
+
+  async getExif(buffer) {
+    const parser = exifParser.create(buffer)
+    return parser.parse()
+  },
+
+  async getFileExif(file) {
+    const buffer = fs.readFileSync(file)
+    return this.getExif(buffer)
   },
 
   // async getExif(file) {
@@ -113,11 +134,6 @@ const tools = {
   //   })
   // },
 
-  async getExif(file) {
-    const buffer = fs.readFileSync(file)
-    const parser = exifParser.create(buffer)
-    return parser.parse()
-  },
 }
 
 module.exports = tools

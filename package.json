@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "worker": "node src/app.js"
+  },
   "devDependencies": {
     "eslint": "^7.12.1",
     "eslint-config-standard": "^16.0.1",
@@ -15,6 +18,7 @@
     "exif-parser": "^0.1.12",
     "lodash": "^4.17.20",
     "log4js": "^6.3.0",
-    "sqlite3": "^5.0.0"
+    "sqlite3": "^5.0.0",
+    "uuid": "^8.3.1"
   }
 }
