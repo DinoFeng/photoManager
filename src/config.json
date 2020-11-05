@@ -1,0 +1,13 @@
+{
+  "folder": {
+    "watch": "d:/ttt",
+    "photo": "d:/photo",
+    "others": "d:/notPhoto"
+  },
+  "photoFolder": {
+    "organizationStructure": "{YYYY}/{MM}/{DD}"
+  },
+  "othersFolder": {
+    "organizationStructure": "{FileType}/{YYYY}/{MM}/{DD}"
+  }
+}
