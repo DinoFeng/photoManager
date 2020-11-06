@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const _ = require('lodash')
 // const ExifImage = require('exif').ExifImage
 const exifParser = require('exif-parser')
 const uuidV1 = require('uuid').v1
@@ -133,7 +134,17 @@ const tools = {
   //     }
   //   })
   // },
+  getExifDate(exif) {
+    const createDate = _.get(exif, ['tags', 'CreateDate'])
+    const dateTimeOriginal = _.get(exif, ['tags', 'DateTimeOriginal'])
+    const modifyDate = _.get(exif, ['tags', 'ModifyDate'])
 
+    const CreateDate = createDate ? new Date(createDate * 1000) : null
+    const DateTimeOriginal = dateTimeOriginal ? new Date(dateTimeOriginal * 1000) : null
+    const ModifyDate = modifyDate ? new Date(modifyDate * 1000) : null
+
+    return exif ? { CreateDate, DateTimeOriginal, ModifyDate } : null
+  },
 }
 
 module.exports = tools

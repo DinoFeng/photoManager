@@ -2,12 +2,19 @@
   "folder": {
     "watch": "d:/ttt",
     "photo": "d:/photo",
-    "others": "d:/notPhoto"
+    "picture": "d:/picture",
+    "other": "d:/notPhoto"
   },
   "photoFolder": {
     "organizationStructure": "{YYYY}/{MM}/{DD}"
   },
   "othersFolder": {
-    "organizationStructure": "{FileType}/{YYYY}/{MM}/{DD}"
+    "organizationStructure": "{FileType}"
+  },
+  "action": "move", //['copy','move']
+  "exchange": {
+    "watchImportFolder": "direct",
+    "exportDetailInfo": "",
+    "exportNewPath": ""
   }
 }

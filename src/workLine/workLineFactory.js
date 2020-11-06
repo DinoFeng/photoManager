@@ -11,7 +11,7 @@ const workLines = fs.readdirSync(path.resolve(__dirname))
   }, {})
 
 const assignWorlLine = (queueName, name) => {
-  console.debug(workLines)
+  // console.debug(workLines)
   const WorkLine = workLines[queueName]
   const w = new WorkLine(name)
   return w

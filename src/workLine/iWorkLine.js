@@ -32,11 +32,19 @@ class BaseWorkLine {
   }
 
   get exportExchange() {
-    return null
+    return {
+      name: '',
+      type: '',
+      key: msg => { return null },
+    }
   }
 
   get bindExchange() {
-    return null
+    return {
+      name: '',
+      type: '',
+      key: '',
+    }
   }
 
   get nextQueue() {
@@ -62,15 +70,15 @@ class BaseWorkLine {
         return rabbit.connection.createChannel()
       })
       .then(async channel => {
-        if (this.exportExchange) {
-          await channel.assertExchange(this.exportExchange, 'fanout', { durable: true })
+        if (_.get(this.exportExchange, 'name')) {
+          await channel.assertExchange(this.exportExchange.name, _.get(this.exportExchange, 'type') || 'fanout', { durable: true })
         }
 
         await channel.assertQueue(queueName, { durable: true }) // durable: 持久化
           .then(async q => {
-            if (this.bindExchange) {
-              await channel.assertExchange(this.bindExchange, 'fanout', { durable: true })
-              await channel.bindQueue(q.queue, this.bindExchange, '')
+            if (_.get(this.bindExchange, 'name')) {
+              await channel.assertExchange(this.bindExchange.name, _.get(this.bindExchange, 'type') || 'fanout', { durable: true })
+              await channel.bindQueue(q.queue, this.bindExchange.name, _.get(this.bindExchange, 'key') || '')
             }
           })
         // , (err, q) => {
@@ -107,7 +115,7 @@ class BaseWorkLine {
   }
 
   async errorHandling(msg, channel, error, taskId) {
-    this.log.info(`${taskId} Process error!`, error)
+    this.log.error(`${taskId} Process error!`, error)
     if (msg.fields.redelivered) {
       if (this.maxRetries > 0) {
         await this.retryHandling(msg, channel, error, taskId)

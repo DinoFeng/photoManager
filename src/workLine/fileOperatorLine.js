@@ -1,4 +1,5 @@
 const NormalWorkLine = require('./iNormalWorkLine')
+const config = require('../config.json')
 
 class fileOperatorLine extends NormalWorkLine {
   get workerName() {
@@ -6,7 +7,11 @@ class fileOperatorLine extends NormalWorkLine {
   }
 
   get bindExchange() {
-    return 'exportExifInfo'
+    const name = 'exportNewPath'
+    return {
+      name,
+      type: config.exchange[name],
+    }
   }
 }
 

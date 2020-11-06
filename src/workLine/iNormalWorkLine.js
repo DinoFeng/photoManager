@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const BaseWorkLine = require('./iWorkLine')
 const { assignWorker } = require('../worker/workmanFactory')
 
@@ -19,11 +20,12 @@ class NormalWorkLine extends BaseWorkLine {
       const worker = assignWorker(this.workerName)
       const result = await worker.DoWork(data, taskId)
       if (result) {
-        this.log.info(result)
+        this.log.info(JSON.stringify(result, null, 2))
         // 广播返回Result
-        if (this.exportExchange) {
+        if (_.get(this.exportExchange, 'name')) {
           try {
-            await channel.publish(this.exportExchange, '', Buffer.from(JSON.stringify(result)), { persistent: true })
+            const key = _.isFunction(this.exportExchange.key) ? this.exportExchange.key(msg) : ''
+            await channel.publish(this.exportExchange.name, key, Buffer.from(JSON.stringify(result)), { persistent: true })
           } catch (e) {
             this.log.error(e)
           }
