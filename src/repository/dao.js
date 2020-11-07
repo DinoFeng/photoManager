@@ -45,8 +45,8 @@ class DAO {
       return this.db.serialize(() => {
         return this.db.run(sql, params, function (err) {
           if (err) {
-            logger.error(`Error running sql:[${sql}], params:[${params}], `)
-            logger.error(err)
+            this.log.error(`Error running sql:[${sql}], params:[${params}], `)
+            this.log.error(err)
             reject(err)
           } else {
             resolve({ id: this.lastID })
@@ -60,8 +60,8 @@ class DAO {
     return new Promise((resolve, reject) => {
       return this.db.get(sql, params, (err, result) => {
         if (err) {
-          logger.error(`Error running sql:[${sql}], params:[${params}], `)
-          logger.error(err)
+          this.log.error(`Error running sql:[${sql}], params:[${params}], `)
+          this.log.error(err)
           reject(err)
         } else {
           resolve(result)
@@ -74,8 +74,8 @@ class DAO {
     return new Promise((resolve, reject) => {
       return this.db.all(sql, params, (err, rows) => {
         if (err) {
-          logger.error(`Error running sql:[${sql}], params:[${params}], `)
-          logger.error(err)
+          this.log.error(`Error running sql:[${sql}], params:[${params}], `)
+          this.log.error(err)
           reject(err)
         } else {
           resolve(rows)
