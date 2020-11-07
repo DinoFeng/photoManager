@@ -1,21 +1,27 @@
 const _ = require('lodash')
-const { logger } = require('../util/logger')
+const { log4js } = require('../util/logger')
 
+const _log = Symbol('log')
 const _dao = Symbol('dao')
 const _genCondition = Symbol('_genCondition')
 const _genSaveSQL = Symbol('_genSaveSQL')
 const _alignFields = Symbol('_alignFields')
 class BaseRepository {
   constructor(dao) {
+    this[_log] = log4js.getLogger(this.tableName)
     return new Promise((resolve, reject) => {
       this[_dao] = dao
       return this.InitTable()
         .then(() => {
-          logger.trace(`table ${this.tableName} ready`)
+          this.log.trace(`table ${this.tableName} ready`)
           resolve(this)
         })
         .catch(err => reject(err))
     })
+  }
+
+  get log() {
+    return this[_log]
   }
 
   get dao() {

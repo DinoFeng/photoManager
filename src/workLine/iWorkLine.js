@@ -71,13 +71,13 @@ class BaseWorkLine {
       })
       .then(async channel => {
         if (_.get(this.exportExchange, 'name')) {
-          await channel.assertExchange(this.exportExchange.name, _.get(this.exportExchange, 'type') || 'fanout', { durable: true })
+          await channel.assertExchange(this.exportExchange.name, _.get(this.exportExchange, 'type') || 'fanout', { durable: false })
         }
 
         await channel.assertQueue(queueName, { durable: true }) // durable: 持久化
           .then(async q => {
             if (_.get(this.bindExchange, 'name')) {
-              await channel.assertExchange(this.bindExchange.name, _.get(this.bindExchange, 'type') || 'fanout', { durable: true })
+              await channel.assertExchange(this.bindExchange.name, _.get(this.bindExchange, 'type') || 'fanout', { durable: false })
               await channel.bindQueue(q.queue, this.bindExchange.name, _.get(this.bindExchange, 'key') || '')
             }
           })

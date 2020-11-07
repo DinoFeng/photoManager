@@ -1,13 +1,13 @@
 const NormalWorkLine = require('./iNormalWorkLine')
-const config = require('../config.json')
+const config = require('../config')
 
-class GetExifWorkLine extends NormalWorkLine {
+class GetDetailWorkLine extends NormalWorkLine {
   get workerName() {
-    return 'GetDetailWorker'
+    return 'GetDetailInfoWorker'
   }
 
   get exportExchange() {
-    const name = 'exportDetailInfo'
+    const name = 'exportPhotoEventDetailInfo'
     return {
       name,
       type: config.exchange[name],
@@ -15,13 +15,12 @@ class GetExifWorkLine extends NormalWorkLine {
   }
 
   get bindExchange() {
-    const name = 'watchImportFolder'
+    const name = 'watchPhotoFolder'
     return {
       name,
       type: config.exchange[name],
-      key: 'add',
     }
   }
 }
 
-module.exports = GetExifWorkLine
+module.exports = GetDetailWorkLine

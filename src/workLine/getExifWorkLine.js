@@ -1,13 +1,13 @@
 const NormalWorkLine = require('./iNormalWorkLine')
 const config = require('../config')
 
-class CalNewPathWorkLine extends NormalWorkLine {
+class GetExifWorkLine extends NormalWorkLine {
   get workerName() {
-    return 'CalNewPathWorker'
+    return 'GetExifWorker'
   }
 
   get exportExchange() {
-    const name = 'exportNewPath'
+    const name = 'exportImportExifInfo'
     return {
       name,
       type: config.exchange[name],
@@ -15,7 +15,7 @@ class CalNewPathWorkLine extends NormalWorkLine {
   }
 
   get bindExchange() {
-    const name = 'exportImportExifInfo'
+    const name = 'watchImportFolder'
     return {
       name,
       type: config.exchange[name],
@@ -23,4 +23,4 @@ class CalNewPathWorkLine extends NormalWorkLine {
   }
 }
 
-module.exports = CalNewPathWorkLine
+module.exports = GetExifWorkLine

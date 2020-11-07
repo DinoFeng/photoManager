@@ -14,11 +14,15 @@ class NormalWorkLine extends BaseWorkLine {
     return null
   }
 
+  async runWork(data, taskId, self) {
+    const worker = assignWorker(self.workerName)
+    return await worker.DoWork(data, taskId)
+  }
+
   async doFeature(msg, channel, taskId) {
     const data = this.parseMessageContent(msg)
     if (data) {
-      const worker = assignWorker(this.workerName)
-      const result = await worker.DoWork(data, taskId)
+      const result = await this.runWork(data, taskId, this)
       if (result) {
         this.log.info(JSON.stringify(result, null, 2))
         // 广播返回Result

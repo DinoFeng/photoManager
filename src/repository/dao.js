@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose()
-const { logger } = require('../util/logger')
+const { log4js } = require('../util/logger')
 // var db = new sqlite3.Database(':memory:');
 // db.serialize(function () {
 //   // db.run("CREATE TABLE lorem (info TEXT)");
@@ -13,21 +13,27 @@ const { logger } = require('../util/logger')
 //   });
 // });
 // db.close();
+const _log = Symbol('log')
 const _dbFile = Symbol('dbFile')
 class DAO {
   constructor(dbFile) {
+    this[_log] = log4js.getLogger('DAO')
     return new Promise((resolve, reject) => {
       this[_dbFile] = dbFile || ':memory:'
       this.db = new sqlite3.Database(this.dbFile, (error) => {
         if (error) {
-          logger.error('Could not connect to database', error)
+          this.log.error('Could not connect to database', error)
           reject(error)
         } else {
-          logger.trace('Connected to database')
+          this.log.trace(`Connected to [${this.dbFile}] database`)
           resolve(this)
         }
       }).configure('busyTimeout', 5000)
     })
+  }
+
+  get log() {
+    return this[_log]
   }
 
   get dbFile() {

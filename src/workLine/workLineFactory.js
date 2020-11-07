@@ -5,7 +5,7 @@ const _ = require('lodash')
 const workLines = fs.readdirSync(path.resolve(__dirname))
   .filter(item => _.endsWith(item, '.js'))
   .map(item => _.trimEnd(item, '.js'))
-  .filter(item => !['workLineFactory', 'iWorkLine', 'iNormalWorkLine'].includes(item))
+  .filter(item => !['workLineFactory', 'iWorkLine', 'iNormalWorkLine', 'iAdoWorkLine'].includes(item))
   .reduce((pre, filename) => {
     return _.merge(pre, { [`${_.upperFirst(filename)}`]: require(path.resolve(__dirname, filename)) })
   }, {})

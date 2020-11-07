@@ -4,8 +4,19 @@ const _ = require('lodash')
 const exifParser = require('exif-parser')
 const uuidV1 = require('uuid').v1
 const fs = require('fs')
+const path = require('path')
+const { DateTime } = require('luxon')
+// const { logger } = require('./logger')
 
 const tools = {
+  get actionWhenExistOptions() {
+    return Object.freeze({
+      Abort: 0,
+      Rename: 1,
+      Overwrite: 2,
+    })
+  },
+
   genUUID() {
     return uuidV1().replace(/-/g, '').toUpperCase()
   },
@@ -139,11 +150,79 @@ const tools = {
     const dateTimeOriginal = _.get(exif, ['tags', 'DateTimeOriginal'])
     const modifyDate = _.get(exif, ['tags', 'ModifyDate'])
 
-    const CreateDate = createDate ? new Date(createDate * 1000) : null
-    const DateTimeOriginal = dateTimeOriginal ? new Date(dateTimeOriginal * 1000) : null
-    const ModifyDate = modifyDate ? new Date(modifyDate * 1000) : null
+    const CreateDate = createDate ? DateTime.fromMillis(createDate * 1000, { zone: 'UTC' }) : null
+    const DateTimeOriginal = dateTimeOriginal ? DateTime.fromMillis(dateTimeOriginal * 1000, { zone: 'UTC' }) : null
+    const ModifyDate = modifyDate ? DateTime.fromMillis(modifyDate * 1000, { zone: 'UTC' }) : null
 
+    // exif && logger.debug({ CreateDate: CreateDate && CreateDate.toFormat('YYYY/MM/DD hh:mm:ss.ttt'), DateTimeOriginal: DateTimeOriginal.toFormat('YYYY/MM/DD hh:mm:ss.ttt') && DateTimeOriginal, ModifyDate: ModifyDate && ModifyDate.toFormat('YYYY/MM/DD hh:mm:ss.ttt') })
+    // logger.debug(exif ? { CreateDate, DateTimeOriginal, ModifyDate } : null)
     return exif ? { CreateDate, DateTimeOriginal, ModifyDate } : null
+  },
+
+  getCopyNumber(str) {
+    const reg = /^(.+) (\d+)$/ig
+    const matchs = reg.exec(str)
+    // logger.trace(matchs, str)
+    if (matchs) {
+      const [, org, num] = matchs
+      // logger.trace({ num })
+      return `${org} ${Number(num) + 1}`
+    } else {
+      return `${str} 0`
+    }
+  },
+
+  getNewName(fileName) {
+    const basename = path.basename(fileName)
+    const extname = path.extname(fileName)
+    const dirname = path.dirname(fileName)
+
+    const name = _.trimEnd(basename, extname)
+
+    const newName = `${this.getCopyNumber(name)}${extname}`
+    // logger.trace({ dirname, newName, extname })
+    return path.join(dirname, newName)
+  },
+
+  async moveFile(sourceFileName, targetFileName, actionWhenExist) {
+    const descDir = path.dirname(targetFileName)
+    if (!fs.existsSync(descDir)) {
+      fs.mkdirSync(descDir, { recursive: true })
+    }
+
+    if (fs.existsSync(targetFileName)) {
+      if (actionWhenExist === this.actionWhenExistOptions.Rename) {
+        const newName = this.getNewName(targetFileName)
+        return this.moveFile(sourceFileName, newName, actionWhenExist)
+      } else if (actionWhenExist !== this.actionWhenExistOptions.Overwrite) {
+        return { sourceFileName, targetFileName: null }
+      }
+    }
+
+    fs.copyFileSync(sourceFileName, targetFileName)
+    fs.unlinkSync(sourceFileName)
+    // fs.renameSync(sourceFileName, targetFileName)
+    // logger.trace({ sourceFileName, targetFileName })
+    return { sourceFileName, targetFileName }
+  },
+
+  async copyFile(sourceFileName, targetFileName, actionWhenExist) {
+    const descDir = path.dirname(targetFileName)
+    if (!fs.existsSync(descDir)) {
+      fs.mkdirSync(descDir, { recursive: true })
+    }
+
+    if (fs.existsSync(targetFileName)) {
+      if (actionWhenExist === this.actionWhenExistOptions.Rename) {
+        const newName = this.getNewName(targetFileName)
+        return this.moveFile(sourceFileName, newName, actionWhenExist)
+      } else if (actionWhenExist !== this.actionWhenExistOptions.Overwrite) {
+        return { sourceFileName, targetFileName: null }
+      }
+    }
+
+    fs.copyFileSync(sourceFileName, targetFileName)
+    return { sourceFileName, targetFileName }
   },
 }
 

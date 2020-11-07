@@ -1,7 +1,7 @@
 const NormalWorkLine = require('./iNormalWorkLine')
-const config = require('../config.json')
+const config = require('../config')
 
-class fileOperatorLine extends NormalWorkLine {
+class FileOperatorLine extends NormalWorkLine {
   get workerName() {
     return 'FileOperator'
   }
@@ -15,4 +15,4 @@ class fileOperatorLine extends NormalWorkLine {
   }
 }
 
-module.exports = fileOperatorLine
+module.exports = FileOperatorLine

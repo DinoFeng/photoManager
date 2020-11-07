@@ -1,0 +1,135 @@
+const x = {
+  startMarker: {
+    offset: 0,
+  },
+  tags: {
+    Make: 'EASTMAN KODAK COMPANY',
+    Model: 'KODAK EASYSHARE CX4230 ZOOM DIGITAL CAMERA',
+    Orientation: 1,
+    XResolution: 230,
+    YResolution: 230,
+    ResolutionUnit: 2,
+    Software: 'ACD Systems Digital Imaging',
+    ModifyDate: 1108977064,
+    YCbCrPositioning: 1,
+    ExposureTime: 0.033333,
+    FNumber: 2.76,
+    ExposureProgram: 2,
+    ISO: 140,
+    DateTimeOriginal: 1108926343,
+    CreateDate: 1108926343,
+    CompressedBitsPerPixel: 3.12,
+    ShutterSpeedValue: 4.9,
+    ApertureValue: 2.92,
+    ExposureCompensation: 0,
+    MaxApertureValue: 2.92,
+    MeteringMode: 2,
+    Flash: 1,
+    FocalLength: 5.54,
+    SubSecTime: '383',
+    ColorSpace: 1,
+    ExifImageWidth: 1632,
+    ExifImageHeight: 1232,
+    ExposureIndex: 140,
+    SensingMethod: 2,
+    CustomRendered: 0,
+    ExposureMode: 0,
+    WhiteBalance: 0,
+    DigitalZoomRatio: 0,
+    FocalLengthIn35mmFormat: 36,
+    SceneCaptureType: 0,
+    GainControl: 0,
+    Contrast: 0,
+    Saturation: 0,
+    Sharpness: 0,
+    SubjectDistanceRange: 0,
+    InteropIndex: 'R98',
+  },
+  imageSize: {
+    height: 1232,
+    width: 1632,
+  },
+  thumbnailOffset: 1569,
+  thumbnailLength: 8586,
+  thumbnailType: 6,
+  app1Offset: 6,
+}
+
+const y = {
+  startMarker: {
+    offset: 0,
+  },
+  tags: {
+    Model: 'MI 5X',
+    Software: 'tiffany-user 8.1.0 OPM1.171019.019 V10.2.2.0.ODBCNXM release-keys',
+    Orientation: 6,
+    ModifyDate: 1548443119,
+    YCbCrPositioning: 1,
+    ResolutionUnit: 2,
+    XResolution: 72,
+    YResolution: 72,
+    Make: 'Xiaomi',
+    GPSLatitudeRef: 'N',
+    GPSLatitude: 22.766995972222222,
+    GPSLongitudeRef: 'E',
+    GPSLongitude: 113.001732,
+    GPSAltitudeRef: 2.2,
+    GPSAltitude: 0,
+    GPSTimeStamp: [
+      11,
+      5,
+      13,
+    ],
+    GPSProcessingMethod: 'ASCII',
+    GPSDateStamp: '2019:01:25',
+    ISO: 400,
+    ExposureProgram: 0,
+    FNumber: 2.2,
+    ExposureTime: 0.030303030303030304,
+    undefined: '{"sensor_type":"rear","mirror":false}',
+    SensingMethod: 2,
+    SubSecTimeDigitized: '181985',
+    SubSecTimeOriginal: '181985',
+    SubSecTime: '181985',
+    FocalLength: 3.81,
+    Flash: 9,
+    MeteringMode: 2,
+    SceneCaptureType: 0,
+    FocalLengthIn35mmFormat: 26,
+    CreateDate: 1548443119,
+    ExifImageHeight: 3000,
+    WhiteBalance: 0,
+    DateTimeOriginal: 1548443119,
+    BrightnessValue: -6.7,
+    ExifImageWidth: 4000,
+    ExposureMode: 0,
+    ApertureValue: 2.27,
+    ColorSpace: 1,
+    ShutterSpeedValue: 5.058,
+    InteropIndex: 'R98',
+  },
+  imageSize: {
+    height: 3000,
+    width: 4000,
+  },
+  thumbnailOffset: 1127,
+  thumbnailLength: 11006,
+  thumbnailType: 6,
+  app1Offset: 6,
+}
+const _ = require('lodash')
+const getType = (v) => {
+  return (_.isString(v) && 'TEXT') ||
+    (_.isInteger(v) && 'INTEGER') ||
+    (_.isNumber(v) && 'NUMERIC') || 'TEXT'
+}
+  ;
+(async () => {
+  const s = _.merge({}, x, y)
+  const sTags = s.tags
+  const sqls = [
+    ...Object.keys(s).map(k => `${k} ${getType(s[k])}`),
+    ...Object.keys(sTags).map(k => `${k} ${getType(sTags[k])}`),
+  ]
+  console.debug(sqls.join(',\n'))
+})()
