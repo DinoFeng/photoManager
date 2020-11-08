@@ -20,8 +20,8 @@ class SqlExcuter extends BaseWorkman {
         if (repository) {
           const actionDatas = data[k]
           return Promise.all(Object.keys(actionDatas).map(action => {
-            this.log.debug(actionDatas, action, actionDatas[action])
-            return actionDatas[action] ? repository[action](actionDatas[action]) : null
+            // this.log.debug(actionDatas, action, actionDatas[action])
+            return actionDatas[action] ? repository[action](actionDatas[action]).then(() => `${k}.${action} Done.`) : null
             // return this.actions[action](repository, actionDatas[action])
           }))
         } else {

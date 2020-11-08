@@ -19,12 +19,16 @@ class NormalWorkLine extends BaseWorkLine {
     return await worker.DoWork(data, taskId)
   }
 
+  displayResult(result, taskId) {
+    this.log.info(`${taskId} result is:`, result)
+  }
+
   async doFeature(msg, channel, taskId) {
     const data = this.parseMessageContent(msg)
     if (data) {
       const result = await this.runWork(data, taskId, this)
       if (result) {
-        this.log.info(JSON.stringify(result, null, 2))
+        this.displayResult(result, taskId)
         // 广播返回Result
         if (_.get(this.exportExchange, 'name')) {
           try {

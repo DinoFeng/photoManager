@@ -24,7 +24,7 @@ const logger = log4js.getLogger('watchPhotoFolder')
     )
 
   const watchFolder = _.get(config, ['folder', 'photo']) || '.'
-  logger.debug({ watchFolder })
+  logger.info({ watchFolder })
 
   const watcher = chokidar.watch(watchFolder, {
     ignored: /^.*photoLib\.db(|-journal)$/,
@@ -45,7 +45,7 @@ const logger = log4js.getLogger('watchPhotoFolder')
     //   channel.publish(exchange, 'unlink', Buffer.from(JSON.stringify({ data: { path, state } })))
     // })
     .on('error', error => logger.error(error))
-    .on('ready', () => logger.debug('Initial scan complete. Ready for changes'))
+    .on('ready', () => logger.info('Initial scan complete. Ready for changes'))
     .on('all', (event, path, state) => {
       logger.info(`${event} file: ${path}`)
       channel.publish(exchange, '', Buffer.from(JSON.stringify({ data: { event, path, state } })))

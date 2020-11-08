@@ -6,6 +6,10 @@ class GetExifWorkLine extends NormalWorkLine {
     return 'GetExifWorker'
   }
 
+  get maxRetries() {
+    return 2
+  }
+
   get exportExchange() {
     const name = 'exportImportExifInfo'
     return {

@@ -123,8 +123,13 @@ const tools = {
   },
 
   async getExif(buffer) {
-    const parser = exifParser.create(buffer)
-    return parser.parse()
+    try {
+      const parser = exifParser.create(buffer)
+      return parser.parse()
+    } catch (error) {
+      this.log.error(error)
+      return null
+    }
   },
 
   async getFileExif(file) {
@@ -151,17 +156,19 @@ const tools = {
   //   })
   // },
   getExifDate(exif) {
-    const createDate = _.get(exif, ['tags', 'CreateDate'])
-    const dateTimeOriginal = _.get(exif, ['tags', 'DateTimeOriginal'])
-    const modifyDate = _.get(exif, ['tags', 'ModifyDate'])
+    if (exif) {
+      const createDate = _.get(exif, ['tags', 'CreateDate'])
+      const dateTimeOriginal = _.get(exif, ['tags', 'DateTimeOriginal'])
+      const modifyDate = _.get(exif, ['tags', 'ModifyDate'])
 
-    const CreateDate = createDate ? DateTime.fromMillis(createDate * 1000, { zone: 'UTC' }) : null
-    const DateTimeOriginal = dateTimeOriginal ? DateTime.fromMillis(dateTimeOriginal * 1000, { zone: 'UTC' }) : null
-    const ModifyDate = modifyDate ? DateTime.fromMillis(modifyDate * 1000, { zone: 'UTC' }) : null
+      const CreateDate = createDate ? DateTime.fromMillis(createDate * 1000, { zone: 'UTC' }) : null
+      const DateTimeOriginal = dateTimeOriginal ? DateTime.fromMillis(dateTimeOriginal * 1000, { zone: 'UTC' }) : null
+      const ModifyDate = modifyDate ? DateTime.fromMillis(modifyDate * 1000, { zone: 'UTC' }) : null
 
-    // exif && logger.debug({ CreateDate: CreateDate && CreateDate.toFormat('YYYY/MM/DD hh:mm:ss.ttt'), DateTimeOriginal: DateTimeOriginal.toFormat('YYYY/MM/DD hh:mm:ss.ttt') && DateTimeOriginal, ModifyDate: ModifyDate && ModifyDate.toFormat('YYYY/MM/DD hh:mm:ss.ttt') })
-    // logger.debug(exif ? { CreateDate, DateTimeOriginal, ModifyDate } : null)
-    return exif ? { CreateDate, DateTimeOriginal, ModifyDate } : null
+      return { CreateDate, DateTimeOriginal, ModifyDate }
+    } else {
+      return null
+    }
   },
 
   getCopyNumber(str) {

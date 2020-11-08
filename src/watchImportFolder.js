@@ -23,13 +23,13 @@ const logRemoved = log4js.getLogger('importFolder.Removed')
     )
 
   const watchFolder = _.get(config, ['folder', 'import']) || '.'
-  logger.debug({ watchFolder })
+  logger.info({ watchFolder })
 
   const watcher = chokidar.watch(watchFolder, { persistent: true, ignoreInitial: false })
   watcher
     .on('add', (path, state) => {
       logAdded.info(`Added File: ${path}`)
-      channel.publish(exchange, 'add', Buffer.from(JSON.stringify({ data: { path, state } })))
+      channel.publish(exchange, '', Buffer.from(JSON.stringify({ data: { path, state } })))
     })
     .on('change', path => {
       logChanged.debug(`Changed file: ${path}`)
@@ -40,4 +40,5 @@ const logRemoved = log4js.getLogger('importFolder.Removed')
       // channel.publish(exchange, 'unlink', Buffer.from(JSON.stringify({ data: path })))
     })
     .on('error', error => logger.error(error))
+    .on('ready', () => logger.info('Initial scan complete. Ready for changes'))
 })()
