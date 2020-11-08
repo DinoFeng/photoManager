@@ -124,7 +124,7 @@ class BaseWorkLine {
       }
       await channel.reject(msg, false) // 丟弃msg
     } else {
-      await channel.reject(msg, true)
+      await channel.reject(msg, true) // 重试
     }
   }
 

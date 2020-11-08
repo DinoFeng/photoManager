@@ -9,7 +9,7 @@ const _dao = Symbol('_dao')
 const _repositories = Symbol('_repositories')
 class sqlExcuterLine extends AdoWorkLine {
   get workerName() {
-    return 'SqlExuter'
+    return 'SqlExcuter'
   }
 
   get ADO() {

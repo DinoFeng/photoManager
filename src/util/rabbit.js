@@ -1,6 +1,9 @@
 const amqp = require('amqplib')
 const _ = require('lodash')
+const { log4js } = require('./logger')
+const logger = log4js.getLogger('Rabbit')
 
+const _log = Symbol('log')
 const _connection = Symbol('_connection')
 const _hostName = Symbol('_hostName')
 const _mqAddress = Symbol('_mqAddress')
@@ -8,11 +11,16 @@ class Rabbit {
   constructor({ address, hostName }) {
     this[_hostName] = hostName
     this[_mqAddress] = address
+    this[_log] = logger
     return Rabbit.createConnection({ address, hostName })
       .then(cnn => {
         this[_connection] = cnn
       })
       .then(() => this)
+  }
+
+  get log() {
+    return this[_log]
   }
 
   get hostName() {
@@ -38,12 +46,12 @@ class Rabbit {
     return amqp.connect(address, { clientProperties: { connection_name: hostName } })
   }
 
-  static async getBalanceQueue(queueList, channel, logger) {
+  static async getBalanceQueue(queueList, channel) {
     const queuesInfo = await Promise.all(queueList.map(async queue => {
       try {
         return await channel.checkQueue(queue)
       } catch (e) {
-        logger && logger.error(e)
+        logger.error(e)
       }
     }))
     // logger && logger.trace(queuesInfo)
@@ -61,12 +69,12 @@ class Rabbit {
     return queue
   }
 
-  static async getBalanceQueueWithSafe(queueList, channel, logger) {
+  static async getBalanceQueueWithSafe(queueList, channel) {
     const queuesInfo = await Promise.all(queueList.map(async queue => {
       try {
-        return await channel.assertQueue(queue, { durable: true })
+        return await channel.assertQueue(queue)
       } catch (e) {
-        logger && logger.error(e)
+        logger.error(e)
       }
     }))
     // logger && logger.trace(queuesInfo)

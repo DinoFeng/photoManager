@@ -1,9 +1,10 @@
 const _ = require('lodash')
 const BaseRepository = require('./iRepository')
+
 const _createTable = Symbol('createTable')
 const _createUniqueIndex = Symbol('createUniqueIndex')
 const _createHashIndex = Symbol('_createHashIndex')
-class PhotoBaseInfoRepository extends BaseRepository {
+class PhotoHashInfoRepository extends BaseRepository {
   get tableName() {
     return 'PhotoHashInfo'
   }
@@ -65,4 +66,4 @@ class PhotoBaseInfoRepository extends BaseRepository {
     }
   }
 }
-module.exports = PhotoBaseInfoRepository
+module.exports = PhotoHashInfoRepository

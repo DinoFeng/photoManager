@@ -6,9 +6,14 @@ const uuidV1 = require('uuid').v1
 const fs = require('fs')
 const path = require('path')
 const { DateTime } = require('luxon')
-// const { logger } = require('./logger')
+const { log4js } = require('./logger')
 
+const log = log4js.getLogger('tools')
 const tools = {
+  get log() {
+    return log
+  },
+
   get actionWhenExistOptions() {
     return Object.freeze({
       Abort: 0,

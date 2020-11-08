@@ -43,7 +43,7 @@ class DAO {
   run(sql, params = []) {
     return new Promise((resolve, reject) => {
       return this.db.serialize(() => {
-        return this.db.run(sql, params, function (err) {
+        return this.db.run(sql, params, (err) => {
           if (err) {
             this.log.error(`Error running sql:[${sql}], params:[${params}], `)
             this.log.error(err)

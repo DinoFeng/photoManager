@@ -2,7 +2,7 @@ const chokidar = require('chokidar')
 const _ = require('lodash')
 const Rabbit = require('./util/rabbit')
 const { log4js } = require('./util/logger')
-const logger = log4js.getLogger('photoFolder')
+const logger = log4js.getLogger('watchPhotoFolder')
   // const logAdded = log4js.getLogger('photoFolder.Added')
   // const logChanged = log4js.getLogger('photoFolder.Changed')
   // const logRemoved = log4js.getLogger('photoFolder.Removed')
@@ -18,7 +18,7 @@ const logger = log4js.getLogger('photoFolder')
     .then(rabbit =>
       rabbit.connection.createChannel()
         .then(async channel => {
-          channel.assertExchange(exchange, exchangeType || 'fanout', { durable: true })
+          channel.assertExchange(exchange, exchangeType || 'fanout', { durable: false })
           return channel
         }),
     )

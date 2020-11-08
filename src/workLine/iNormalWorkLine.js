@@ -38,15 +38,15 @@ class NormalWorkLine extends BaseWorkLine {
         if (this.nextQueue) {
           await channel.sendToQueue(this.nextQueue, Buffer.from(JSON.stringify(result)), { persistent: true })
         }
-        await channel.ack(msg)
+        await channel.ack(msg) // 消化
         return true
       } else {
-        await channel.reject(msg, false)
+        await channel.reject(msg, false) // 丢弃
         return false
       }
     } else {
       this.deadLineHandling(msg, new Error('Invalid message.'))
-      await channel.reject(msg, false)
+      await channel.reject(msg, false) // 丢弃
       return false
     }
   }

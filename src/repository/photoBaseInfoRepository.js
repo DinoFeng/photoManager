@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const BaseRepository = require('./iRepository')
+
 const _createTable = Symbol('createTable')
 const _createUniqueIndex = Symbol('createUniqueIndex')
 const _createDirNameIndex = Symbol('_createDirNameIndex')
@@ -24,6 +25,7 @@ class PhotoBaseInfoRepository extends BaseRepository {
         fullName TEXT NOT NULL UNIQUE,
         dirname TEXT,
         basename TEXT,
+        imageType TEXT,
         rootdir TEXT,
         size INTEGER,
         atimeMs NUMERIC,

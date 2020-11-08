@@ -1,10 +1,7 @@
 // const _ = require('lodash')
 const BaseWorkman = require('./iWorkman')
-const { repositories } = require('../repository/repositoryFactory')
-// const tools = require('../util/tools')
-// const fs = require('fs')
 
-class GetHashWorker extends BaseWorkman {
+class SqlExcuter extends BaseWorkman {
   // get actions() {
   //   return {
   //     save: async (repository, data) => repository.save(data),
@@ -12,22 +9,27 @@ class GetHashWorker extends BaseWorkman {
   //   }
   // }
 
-  async DoWork(input, taskId, ado) {
+  async DoWork(input, taskId, repositories) {
+    // { table: { action: { data } } }
     const { data } = input
-    return Promise.all(Object.keys(data).map(k => {
-      const Repository = repositories[k]
-      if (Repository) {
-        const repository = new Repository(ado)
-        const actionDatas = data[k]
-        return Promise.all(Object.keys(actionDatas.map(action => {
-          return repository[action](actionDatas[action])
-          // return this.actions[action](repository, actionDatas[action])
-        })))
-      } else {
-        return null
-      }
-    }))
+    // this.log.debug(input, data)
+    if (data) {
+      return await Promise.all(Object.keys(data).map(k => {
+        const repository = repositories[k]
+        // this.log.debug(data, k, data[k], repository)
+        if (repository) {
+          const actionDatas = data[k]
+          return Promise.all(Object.keys(actionDatas).map(action => {
+            this.log.debug(actionDatas, action, actionDatas[action])
+            return actionDatas[action] ? repository[action](actionDatas[action]) : null
+            // return this.actions[action](repository, actionDatas[action])
+          }))
+        } else {
+          return null
+        }
+      }))
+    }
   }
 }
 
-module.exports = GetHashWorker
+module.exports = SqlExcuter
