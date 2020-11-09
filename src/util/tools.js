@@ -69,7 +69,8 @@ const tools = {
   getImageType(fileBuffer) {
     // 将上文提到的 文件标识头 按 字节 整理到数组中
     const imageBufferHeaders = [
-      { bufBegin: [0xff, 0xd8], bufEnd: [0xff, 0xd9], suffix: 'jpg' },
+      // { bufBegin: [0xff, 0xd8], bufEnd: [0xff, 0xd9], suffix: 'jpg' },
+      { bufBegin: [0xff, 0xd8], suffix: 'jpg' },
       {
         bufBegin: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
         suffix: 'png',

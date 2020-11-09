@@ -15,7 +15,7 @@ class CalNewPathWorker extends BaseWorkman {
 
     const newPath = imageType
       ? birthDate
-        ? path.join(_.get(config, ['folder', 'photo']), `${birthDate.toFormat('yyyy/yyyy-MM/dd')}`)
+        ? path.join(_.get(config, ['folder', 'photo']), `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
         : _.get(config, ['folder', 'picture'])
       : _.get(config, ['folder', 'other'])
 

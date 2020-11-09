@@ -32,22 +32,22 @@ const logger = log4js.getLogger('watchPhotoFolder')
     ignoreInitial: true,
   })
   watcher
-    // .on('add', (path, state) => {
-    //   logAdded.info(`Added File: ${path}`)
-    //   channel.publish(exchange, 'add', Buffer.from(JSON.stringify({ data: { path, state } })))
-    // })
-    // .on('change', (path, state) => {
-    //   logChanged.info(`Changed file: ${path}`)
-    //   channel.publish(exchange, 'change', Buffer.from(JSON.stringify({ data: { path, state } })))
-    // })
-    // .on('unlink', (path, state) => {
-    //   logRemoved.info(`Removed file: ${path}`)
-    //   channel.publish(exchange, 'unlink', Buffer.from(JSON.stringify({ data: { path, state } })))
-    // })
+    .on('add', (path, state) => {
+      logger.info(`Added File: ${path}`)
+      channel.publish(exchange, '', Buffer.from(JSON.stringify({ data: { event: 'add', path, state } })))
+    })
+    .on('change', (path, state) => {
+      logger.info(`Changed file: ${path}`)
+      channel.publish(exchange, '', Buffer.from(JSON.stringify({ data: { event: 'change', path, state } })))
+    })
+    .on('unlink', (path, state) => {
+      logger.info(`Removed file: ${path}`)
+      channel.publish(exchange, '', Buffer.from(JSON.stringify({ data: { event: 'unlink', path, state } })))
+    })
     .on('error', error => logger.error(error))
     .on('ready', () => logger.info('Initial scan complete. Ready for changes'))
-    .on('all', (event, path, state) => {
-      logger.info(`${event} file: ${path}`)
-      channel.publish(exchange, '', Buffer.from(JSON.stringify({ data: { event, path, state } })))
-    })
+  // .on('all', (event, path, state) => {
+  //   logger.info(`${event} file: ${path}`)
+  //   channel.publish(exchange, '', Buffer.from(JSON.stringify({ data: { event, path, state } })))
+  // })
 })()
