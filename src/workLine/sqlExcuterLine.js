@@ -21,7 +21,8 @@ class sqlExcuterLine extends AdoWorkLine {
   }
 
   async beforeConsume() {
-    const dbFile = path.join(config.folder.photo, 'photoLib.db')
+    // const dbFile = path.join(config.folder.photo, 'photoLib.db')
+    const dbFile = path.join('D:/', 'photoLib.db')
     const dao = await new DAO(dbFile)
     this[_dao] = dao
 

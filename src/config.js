@@ -1,6 +1,6 @@
 module.exports = {
   folder: {
-    import: 'd:/ttt',
+    import: 'D:/photo',
     photo: '\\\\192.168.0.187\\LiveRecords\\My Photos',
     picture: 'd:/picture',
     other: 'd:/notPhoto',

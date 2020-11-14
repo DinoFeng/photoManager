@@ -7,7 +7,7 @@ const config = require('../config')
 
 class CalNewPathWorker extends BaseWorkman {
   async DoWork(input, taskId) {
-    const { data: { fullFileName, exifInfo, imageType } } = input
+    const { data: { fullFileName, exifInfo, imageType, hashFlags, state } } = input
 
     const { CreateDate, DateTimeOriginal, ModifyDate } = tools.getExifDate(exifInfo) || {}
     const birthDate = CreateDate || DateTimeOriginal || ModifyDate
@@ -15,7 +15,7 @@ class CalNewPathWorker extends BaseWorkman {
 
     const newPath = imageType
       ? birthDate
-        ? path.join(_.get(config, ['folder', 'photo']), `${birthDate.toFormat('yyyy/yyyy-MM/dd')}`)
+        ? path.join(_.get(config, ['folder', 'photo']), `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
         : _.get(config, ['folder', 'picture'])
       : _.get(config, ['folder', 'other'])
 
@@ -25,7 +25,7 @@ class CalNewPathWorker extends BaseWorkman {
     const relative = path.relative(importPath, dirName)
 
     const newFullFileName = birthDate ? path.join(newPath, baseName) : path.join(newPath, relative, baseName)
-    return { data: { fullFileName, newFullFileName } }
+    return { data: { fullFileName, newFullFileName, exifInfo, imageType, hashFlags, state } }
   }
 }
 
