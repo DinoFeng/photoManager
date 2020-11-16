@@ -10,6 +10,8 @@
  * Note: Changes to this file (but not any file it imports!) are picked up by the
  * development server, but such updates are costly since the dev-server needs a reboot.
  */
+const log = require('./middleware/logger.middleware')
+const bodyParser = require('body-parser')
 
 module.exports.extendApp = function ({ app, ssr }) {
   /*
@@ -18,4 +20,7 @@ module.exports.extendApp = function ({ app, ssr }) {
 
      Example: app.use(), app.get() etc
   */
+  app.use(bodyParser.json({ limit: '10mb' }))
+  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(log)
 }
