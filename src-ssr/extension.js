@@ -10,8 +10,11 @@
  * Note: Changes to this file (but not any file it imports!) are picked up by the
  * development server, but such updates are costly since the dev-server needs a reboot.
  */
-const log = require('./middleware/logger.middleware')
+const logMiddleware = require('./middleware/logger.middleware')
 const bodyParser = require('body-parser')
+const AdoAccess = require('./util/adoAccess')
+const imagesInfoRouter = require('./api/images')
+const { logger } = require('./util/logger')
 
 module.exports.extendApp = function ({ app, ssr }) {
   /*
@@ -22,5 +25,24 @@ module.exports.extendApp = function ({ app, ssr }) {
   */
   app.use(bodyParser.json({ limit: '10mb' }))
   app.use(bodyParser.urlencoded({ extended: false }))
-  app.use(log)
+  app.use(logMiddleware)
+
+  app.locals.adoAccess = new AdoAccess()
+  app.use((req, res, next) => {
+    req.getADO = async (dbFile) => {
+      const adoAccess = app.locals.adoAccess
+      if (adoAccess.dbFile !== dbFile) {
+        return await adoAccess.init(dbFile)
+        // logger.debug('y:', y)
+        // return y
+      } else {
+        return adoAccess.getADO()
+        // logger.debug('x:', x)
+        // return x
+      }
+    }
+    next()
+  })
+
+  app.use('/api', imagesInfoRouter)
 }

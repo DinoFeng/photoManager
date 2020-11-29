@@ -47,17 +47,20 @@ log4js.getLogger = category => {
   l.time = name => {
     // console.time(name)
     profile[name] = process.hrtime()
+    return 0
   }
   l.timeEnd = (name, level) => {
     const diff = process.hrtime(profile[name])
     delete profile[name]
     const log = (level || 'info').toLowerCase()
-    l[log](`${name}: durationMs = ${(diff[0] * NS_PER_SEC + diff[1]) / MS_PER_SEC} ms`)
+    const durationMs = (diff[0] * NS_PER_SEC + diff[1]) / MS_PER_SEC
+    l[log](`${name}: durationMs = ${durationMs} ms`)
+    return durationMs
     // console.timeEnd(name)
   }
   l.profile = (name, level) => {
     const start = profile[name]
-    start ? l.timeEnd(name, level) : l.time(name)
+    return start ? l.timeEnd(name, level) : l.time(name)
     // if (start) {
     //   l.timeEnd(name, level)
     // } else {

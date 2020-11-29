@@ -6,11 +6,16 @@ module.exports = (req, res, next) => {
   const id = uuidV1().replace(/-/g, '').toUpperCase()
   logger.info(`${id} ${req.url} Request...`)
   logger.time(id)
+  req.requestId = req.requestId || id
 
   res.on('finish', function () {
     const status = res.statusCode
     logger.timeEnd(id)
-    logger.info(`${id} ${req.url} ${status} Done...`)
+    if (status === 200) {
+      logger.info(`${id} ${req.url} ${status} Done...`)
+    } else {
+      logger.error(`${id} ${req.url} ${status} exception!!!`)
+    }
   })
   next()
 }

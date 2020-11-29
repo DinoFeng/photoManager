@@ -1,64 +1,31 @@
-<template lang='pug'>
-  q-layout(view='lHh Lpr lFf')
-    q-header(elevated)
-      q-toolbar
-        q-btn(flat dense round icon='menu' aria-label='Menu' @click='leftDrawerOpen = !leftDrawerOpen')
-          q-toolbar-title
-            | Quasar App
-          div Quasar v{{ $q.version }}
-    q-drawer(v-model='leftDrawerOpen' show-if-above bordered content-class='bg-grey-1')
-      q-list
-        q-item-label.text-grey-8(header)
-          | Essential Links
-        essential-link(v-for='link in essentialLinks' :key='link.title' v-bind='link')
-    q-page-container
-      router-view
+<template lang="pug">
+q-layout(view='hHh lpR fFf')
+  q-header.bg-primary.text-white(elevated height-hint='98')
+    q-toolbar
+      q-btn(dense flat round icon='menu' @click='left = !left')
+      q-toolbar-title
+        //- q-avatar
+        //-   img(src='https://cdn.quasar.dev/logo/svg/quasar-logo.svg')
+        | Photo Manager App
+      | Quasar v{{ $q.version }}
+      //- q-btn(dense flat round icon='menu' @click='right = !right')
+  q-drawer(show-if-above v-model='left' side='left' bordered)
+    q-list
+      q-item-label.text-grey-8(header)
+        | Essential Links
+      essential-link(v-for='link in essentialLinks' :key='link.title' v-bind='link')
 
-  //- <q-layout view="lHh Lpr lFf">
-  //-   <q-header elevated>
-  //-     <q-toolbar>
-  //-       <q-btn
-  //-         flat
-  //-         dense
-  //-         round
-  //-         icon="menu"
-  //-         aria-label="Menu"
-  //-         @click="leftDrawerOpen = !leftDrawerOpen"
-  //-       />
+  //- q-drawer(show-if-above v-model='right' side='right' bordered)
+    //- drawer content
+  q-page-container
+    router-view
+  q-footer.bg-grey-8.text-white(elevated)
+    q-toolbar
+      q-toolbar-title
+        //- q-avatar
+        //-   img(src='https://cdn.quasar.dev/logo/svg/quasar-logo.svg')
+        | Build No.
 
-  //-       <q-toolbar-title>
-  //-         Quasar App
-  //-       </q-toolbar-title>
-
-  //-       <div>Quasar v{{ $q.version }}</div>
-  //-     </q-toolbar>
-  //-   </q-header>
-
-  //-   <q-drawer
-  //-     v-model="leftDrawerOpen"
-  //-     show-if-above
-  //-     bordered
-  //-     content-class="bg-grey-1"
-  //-   >
-  //-     <q-list>
-  //-       <q-item-label
-  //-         header
-  //-         class="text-grey-8"
-  //-       >
-  //-         Essential Links
-  //-       </q-item-label>
-  //-       <EssentialLink
-  //-         v-for="link in essentialLinks"
-  //-         :key="link.title"
-  //-         v-bind="link"
-  //-       />
-  //-     </q-list>
-  //-   </q-drawer>
-
-  //-   <q-page-container>
-  //-     <router-view />
-  //-   </q-page-container>
-  //- </q-layout>
 </template>
 
 <script>
@@ -112,10 +79,12 @@ const linksData = [
 export default {
   name: 'MainLayout',
   components: { EssentialLink },
-  data () {
+  data() {
     return {
       leftDrawerOpen: false,
-      essentialLinks: linksData
+      essentialLinks: linksData,
+      left: false,
+      right: false
     }
   }
 }
