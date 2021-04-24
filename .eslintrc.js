@@ -2,8 +2,9 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 8,
   },
+  parser: 'babel-eslint',
   extends: 'standard',
-  plugins: ['standard', 'promise', 'node', 'prettier'],
+  plugins: ['standard', 'promise', 'node', 'prettier', 'flowtype'],
   env: {
     node: true,
     mocha: true,
