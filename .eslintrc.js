@@ -4,7 +4,7 @@ module.exports = {
   },
   parser: 'babel-eslint',
   extends: 'standard',
-  plugins: ['standard', 'promise', 'node', 'prettier', 'flowtype'],
+  plugins: ['standard', 'promise', 'node', 'flowtype'],
   env: {
     node: true,
     mocha: true,

@@ -7,17 +7,20 @@
   "author": "DinoFung <dino_f@live.cn>",
   "license": "ISC",
   "scripts": {
+    "start": "nodemon --exec yarn dev",
     "dev": "cross-env NODE_ENV=local babel-node --inspect src/app.js --inspect-workers",
     "build": "babel src -d dist"
   },
   "dependencies": {
-    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
     "exif-parser": "^0.1.12",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "log4js": "^6.3.0",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.0.2",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
