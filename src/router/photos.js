@@ -6,6 +6,8 @@ import _ from 'lodash'
 import exifParser from 'exif-parser'
 import { DateTime } from 'luxon'
 import { logger } from '../util/logger'
+// import myStorageEngine from '../util/multerStorageEngine'
+const myStorageEngine = require('../util/multerStorageEngine')
 const router = express()
 
 const getExif = function (buffer) {
@@ -34,33 +36,53 @@ const getExifDate = function (exif) {
   }
 }
 
-const storage = multer.diskStorage({
+const storage = myStorageEngine({
   destination: function (req, file, cb) {
+    // const data = req.body
+    // const exif = getExif(file.buffer)
+    // logger.debug('yy', exif)
+    // const { CreateDate, DateTimeOriginal, ModifyDate } = getExifDate(exif) || {}
+    // const birthDate = CreateDate || DateTimeOriginal || ModifyDate
     // const dest = path.join('upload', 'photos', `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
     const dest = path.join('upload', 'photos')
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true })
     }
     cb(null, dest)
-    const chunks = []
-    file.stream.on('error', (err) => {
-      // Be sure to handle this properly!
-      logger.error(err)
-    })
-    file.stream.on('end', () => {
-      const exif = getExif(Buffer.concat(chunks))
-      req.body = _.merge(req.body, { [file.originalname]: exif })
-      logger.debug(req.body)
+    //   const chunks = []
+    //   file.stream.on('error', (err) => {
+    //     // Be sure to handle this properly!
+    //     logger.error(err)
+    //   })
+    //   file.stream.on('end', () => {
+    //     const exif = getExif(Buffer.concat(chunks))
+    // req.body = _.merge(req.body, { [file.originalname]: exif })
+    //     logger.debug(req.body)
 
-      // const { CreateDate, DateTimeOriginal, ModifyDate } = getExifDate(exif) || {}
-      // const birthDate = CreateDate || DateTimeOriginal || ModifyDate
-    })
-    file.stream.on('data', (chunk) => {
-      chunks.push(chunk)
-    })
+    //     // const { CreateDate, DateTimeOriginal, ModifyDate } = getExifDate(exif) || {}
+    //     // const birthDate = CreateDate || DateTimeOriginal || ModifyDate
+    //     // const dest = path.join('upload', 'photos', `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
+    //     // // const dest = path.join('upload', 'photos')
+    //     // if (!fs.existsSync(dest)) {
+    //     //   fs.mkdirSync(dest, { recursive: true })
+    //     // }
+    //     // cb(null, dest)
+    //   })
+    //   file.stream.on('data', (chunk) => {
+    //     chunks.push(chunk)
+    //   })
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname)
+  },
+  writed: function (file, cb) {
+    // logger.debug('end', file.buffer)
+    if (file.buffer) {
+      const exif = getExif(file.buffer)
+      const { CreateDate, DateTimeOriginal, ModifyDate } = getExifDate(exif) || {}
+      const birthDate = CreateDate || DateTimeOriginal || ModifyDate
+      logger.debug(file.path, `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
+    }
   },
 })
 
@@ -93,6 +115,8 @@ router.post('/', upload.array('photos'), (req, res, next) => {
   //   // 一切都好
   // })
   const data = req.body
+  // logger.debug('xx', data)
+  // res.status(200).json(JSON.stringify(data))
   res.status(200).json({ data })
 })
 
