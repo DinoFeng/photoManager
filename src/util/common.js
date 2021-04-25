@@ -26,3 +26,4 @@ const wrapAsync = (func) => async (req, res, next) => {
 }
 
 module.exports = { wrapAsync }
+export default { wrapAsync }

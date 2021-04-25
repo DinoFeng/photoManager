@@ -82,3 +82,8 @@ module.exports = {
   log4js,
   loggerStream,
 }
+export default {
+  logger,
+  log4js,
+  loggerStream,
+}

@@ -6,5 +6,5 @@ const tools = {
     return _.replace(v, reg, '$1')
   },
 }
-
+module.exports = tools
 export default tools

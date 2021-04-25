@@ -12,13 +12,5 @@ const router = fs
     return _.merge(pre, { [`${_.upperFirst(filename)}`]: require(path.resolve(__dirname, filename)) })
   }, {})
 
-// const assignWorker = (workType) => {
-//   const Workman = workmans[workType]
-//   if (Workman) {
-//     const w = new Workman()
-//     return w
-//   }
-// }
-
-// module.exports = { assignWorker }
+module.exports = router
 export default router
