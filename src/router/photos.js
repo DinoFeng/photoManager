@@ -81,7 +81,9 @@ const storage = myStorageEngine({
       const exif = getExif(file.buffer)
       const { CreateDate, DateTimeOriginal, ModifyDate } = getExifDate(exif) || {}
       const birthDate = CreateDate || DateTimeOriginal || ModifyDate
-      logger.debug(file.path, `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
+      if (birthDate) {
+        logger.debug(file.path, `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
+      }
     }
   },
 })
@@ -95,7 +97,7 @@ const fileFilter = function (req, file, cb) {
   logger.debug(`${file.originalname} mimetype is:${file.mimetype}`)
 
   // // 接受这个文件，使用`true`，像这样:
-  cb(null, ['image/jpeg'].includes(file.mimetype))
+  cb(null, ['image/jpeg', 'image/png'].includes(file.mimetype))
 
   // // 如果有问题，你可以总是这样发送一个错误:
   // cb(new Error("I don't have a clue!"))

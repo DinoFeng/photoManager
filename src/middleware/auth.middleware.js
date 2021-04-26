@@ -7,16 +7,17 @@ const authHelper = async (req, res, next) => {
   // setTimeout(function() {next()},  1000);
   try {
     const authorization = _.get(req, ['headers', 'authorization'], '')
-    // logger.debug({ authorization });
+    // logger.debug({ authorization })
     const auth = authorization.split(' ')
 
     const tokenStr = auth[0].toLowerCase() === 'bearer' ? auth[1] : auth[0]
-    // logger.debug({ tokenStr });
+    // logger.debug({ tokenStr })
 
     if (tokenStr) {
       req.token = tokenStr
       const profile = jwt.decode(tokenStr)
-      const email = _.get(profile, ['unique_name'])
+      // logger.debug({ profile })
+      const email = _.get(profile, ['unique_name']) || _.get(profile, ['email']) || ''
       const userNt = email.split('@')[0].toLowerCase()
       const givenName = _.get(profile, ['given_name'])
       const familyName = _.get(profile, ['family_name'])
