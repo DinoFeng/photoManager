@@ -2,39 +2,11 @@ import express from 'express'
 import multer from 'multer'
 import fs from 'fs'
 import path from 'path'
-import _ from 'lodash'
-import exifParser from 'exif-parser'
-import { DateTime } from 'luxon'
+import iconv from 'iconv-lite'
 import { logger } from '../util/logger'
 // import myStorageEngine from '../util/multerStorageEngine'
 const myStorageEngine = require('../util/multerStorageEngine')
 const router = express()
-
-const getExif = function (buffer) {
-  try {
-    const parser = exifParser.create(buffer)
-    return parser.parse()
-  } catch (error) {
-    logger.error(error)
-    return null
-  }
-}
-
-const getExifDate = function (exif) {
-  if (exif) {
-    const createDate = _.get(exif, ['tags', 'CreateDate'])
-    const dateTimeOriginal = _.get(exif, ['tags', 'DateTimeOriginal'])
-    const modifyDate = _.get(exif, ['tags', 'ModifyDate'])
-
-    const CreateDate = createDate ? DateTime.fromMillis(createDate * 1000, { zone: 'UTC' }) : null
-    const DateTimeOriginal = dateTimeOriginal ? DateTime.fromMillis(dateTimeOriginal * 1000, { zone: 'UTC' }) : null
-    const ModifyDate = modifyDate ? DateTime.fromMillis(modifyDate * 1000, { zone: 'UTC' }) : null
-
-    return { CreateDate, DateTimeOriginal, ModifyDate }
-  } else {
-    return null
-  }
-}
 
 const storage = myStorageEngine({
   destination: function (req, file, cb) {
@@ -73,19 +45,24 @@ const storage = myStorageEngine({
     //   })
   },
   filename: function (req, file, cb) {
+    const b = iconv.encode(file.originalname, 'gbk')
+    // const b = Buffer.from(file.originalname, 'utf8')
+    // // const s=b.toString('')
+    // const s = iconv.decode(b, 'utf8')
+    logger.debug(b)
     cb(null, file.originalname)
   },
-  writed: function (file, cb) {
-    // logger.debug('end', file.buffer)
-    if (file.buffer) {
-      const exif = getExif(file.buffer)
-      const { CreateDate, DateTimeOriginal, ModifyDate } = getExifDate(exif) || {}
-      const birthDate = CreateDate || DateTimeOriginal || ModifyDate
-      if (birthDate) {
-        logger.debug(file.path, `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
-      }
-    }
-  },
+  // writed: function (file, cb) {
+  //   // logger.debug('end', file.buffer)
+  //   if (file.buffer) {
+  //     const exif = getExif(file.buffer)
+  //     const { CreateDate, DateTimeOriginal, ModifyDate } = getExifDate(exif) || {}
+  //     const birthDate = CreateDate || DateTimeOriginal || ModifyDate
+  //     if (birthDate) {
+  //       logger.debug(file.path, `${birthDate.toFormat('yyyy/yyyy-MM-dd')}`)
+  //     }
+  //   }
+  // },
 })
 
 const fileFilter = function (req, file, cb) {
@@ -117,9 +94,35 @@ router.post('/', upload.array('photos'), (req, res, next) => {
   //   // 一切都好
   // })
   const data = req.body
+  const files = req.files
+  const xFiles = files.map(({
+    path,
+    size,
+    md5,
+    sha1,
+    sha256,
+    sha512,
+    exif,
+    originalname,
+    fieldname,
+    encoding,
+    mimetype,
+  }) => ({
+    path,
+    fieldname,
+    originalname,
+    mimetype,
+    encoding,
+    size,
+    md5,
+    sha1,
+    sha256,
+    sha512,
+    exif,
+  }))
   // logger.debug('xx', data)
   // res.status(200).json(JSON.stringify(data))
-  res.status(200).json({ data })
+  res.status(200).json({ data, xFiles })
 })
 
 module.exports = router

@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import tools from '../util/tools'
 
 function getDestination(req, file, cb) {
   const dest = path.join('temp')
@@ -13,7 +14,7 @@ function getFileName(req, file, cb) {
   cb(null, file.originalname)
 }
 
-function storageFinish(file) {}
+function storageFinish(file) { }
 
 function MyCustomStorage(opts) {
   this.getDestination = opts.destination || getDestination
@@ -30,24 +31,36 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
       const fullName = path.join(dir, fileName)
 
       const outStream = fs.createWriteStream(fullName)
-
+      const hashs = ['md5', 'sha1', 'sha256', 'sha512'].map(t => tools.genCryptoHash(t))
       const chunks = []
-      // let buffer
+      let buffer
       file.stream.on('data', (chunk) => {
         chunks.push(chunk)
       })
       file.stream.on('end', () => {
-        file.buffer = Buffer.concat(chunks)
+        buffer = Buffer.concat(chunks)
+        hashs.forEach(h => h.end())
       })
 
       file.stream.pipe(outStream)
+      // hashs.forEach(h => file.stream.pipe(h))
       outStream.on('error', cb)
       outStream.on('finish', () => {
-        cb(null, {
-          path: fullName,
-          size: outStream.bytesWritten,
-        })
-        this.storageFinish(file)
+        // const [md5, sha1, sha256, sha512] = await Promise.all(['md5', 'sha1', 'sha256', 'sha512'].map(type => tools.genCrypto(buffer, type)))
+        Promise.all([...hashs.map(h => h.read()), tools.getExif(buffer)])
+          .then(([md5, sha1, sha256, sha512, exif]) =>
+            // this.storageFinish(file)
+            cb(null, {
+              path: fullName,
+              size: outStream.bytesWritten,
+              md5,
+              sha1,
+              sha256,
+              sha512,
+              exif,
+              buffer,
+            }),
+          )
       })
     })
   })
