@@ -3,6 +3,7 @@ import multer from 'multer'
 import fs from 'fs'
 import path from 'path'
 import iconv from 'iconv-lite'
+// import ec from 'encoding_convertor'
 import { logger } from '../util/logger'
 // import myStorageEngine from '../util/multerStorageEngine'
 const myStorageEngine = require('../util/multerStorageEngine')
@@ -45,11 +46,13 @@ const storage = myStorageEngine({
     //   })
   },
   filename: function (req, file, cb) {
+    const { name } = req.body
     const b = iconv.encode(file.originalname, 'gbk')
+    const bb = iconv.encode('微信图片_20210429104607.jpg', 'gbk')
     // const b = Buffer.from(file.originalname, 'utf8')
     // // const s=b.toString('')
     // const s = iconv.decode(b, 'utf8')
-    logger.debug(b)
+    logger.debug({ b, bb, name })
     cb(null, file.originalname)
   },
   // writed: function (file, cb) {

@@ -1699,6 +1699,11 @@ encodeurl@~1.0.2:
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
   integrity sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=
 
+encoding_convertor@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.npmjs.org/encoding_convertor/-/encoding_convertor-0.2.1.tgz#0e31e3a249c448f1c974ef9a57d84a0f420c6316"
+  integrity sha1-DjHjoknESPHJdO+aV9hKD0IMYxY=
+
 end-of-stream@^1.1.0:
   version "1.4.4"
   resolved "https://registry.nlark.com/end-of-stream/download/end-of-stream-1.4.4.tgz#5ae64a5f45057baf3626ec14da0ca5e4b2431eb0"

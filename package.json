@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "cookie-parser": "^1.4.5",
+    "encoding_convertor": "^0.2.1",
     "exif-parser": "^0.1.12",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
