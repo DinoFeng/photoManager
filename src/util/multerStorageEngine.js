@@ -1,4 +1,5 @@
 import fs from 'fs'
+import _ from 'lodash'
 import path from 'path'
 import tools from '../util/tools'
 
@@ -14,12 +15,14 @@ function getFileName(req, file, cb) {
   cb(null, file.originalname)
 }
 
-function storageFinish(file) { }
+function storageFinish(req, file, cb) {
+  cb(null, file)
+}
 
 function MyCustomStorage(opts) {
   this.getDestination = opts.destination || getDestination
   this.getFileName = opts.filename || getFileName
-  this.storageFinish = opts.writed || storageFinish
+  this.storageFinish = opts.storageFinish || storageFinish
 }
 
 MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
@@ -31,7 +34,7 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
       const fullName = path.join(dir, fileName)
 
       const outStream = fs.createWriteStream(fullName)
-      const hashs = ['md5', 'sha1', 'sha256', 'sha512'].map(t => tools.genCryptoHash(t))
+      const hashs = ['md5', 'sha1', 'sha256', 'sha512'].map((t) => tools.genCryptoHash(t))
       const chunks = []
       let buffer
       file.stream.on('data', (chunk) => {
@@ -39,28 +42,35 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
       })
       file.stream.on('end', () => {
         buffer = Buffer.concat(chunks)
-        hashs.forEach(h => h.end())
+        hashs.forEach((h) => h.end())
       })
 
       file.stream.pipe(outStream)
-      // hashs.forEach(h => file.stream.pipe(h))
+      hashs.forEach(h => file.stream.pipe(h))
       outStream.on('error', cb)
       outStream.on('finish', () => {
         // const [md5, sha1, sha256, sha512] = await Promise.all(['md5', 'sha1', 'sha256', 'sha512'].map(type => tools.genCrypto(buffer, type)))
-        Promise.all([...hashs.map(h => h.read()), tools.getExif(buffer)])
-          .then(([md5, sha1, sha256, sha512, exif]) =>
-            // this.storageFinish(file)
-            cb(null, {
-              path: fullName,
+        Promise.all([...hashs.map((h) => h.read()), tools.getExif(buffer), fs.statSync(fullName)]).then(
+          ([md5, sha1, sha256, sha512, exif, stat]) => {
+            _.merge(file, {
+              path: dir,
+              fileName,
               size: outStream.bytesWritten,
+              fullName,
               md5,
               sha1,
               sha256,
               sha512,
               exif,
               buffer,
-            }),
-          )
+              stat,
+            })
+            return this.storageFinish(req, file, (e, file) => {
+              if (e) return cb(e)
+              cb(null, {})
+            })
+          },
+        )
       })
     })
   })

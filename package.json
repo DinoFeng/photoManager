@@ -13,17 +13,15 @@
   },
   "dependencies": {
     "cookie-parser": "^1.4.5",
-    "encoding_convertor": "^0.2.1",
     "exif-parser": "^0.1.12",
     "express": "^4.17.1",
-    "fs": "^0.0.1-security",
-    "iconv-lite": "^0.6.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "log4js": "^6.3.0",
     "luxon": "^1.26.0",
     "multer": "^1.4.2",
     "sqlite3": "^5.0.2",
+    "typeorm": "^0.2.32",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

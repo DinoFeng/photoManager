@@ -25,10 +25,14 @@ const tools = {
             hash.end()
             const code = hash.read()
             resolve(code)
-          } catch (err) { reject(err) }
+          } catch (err) {
+            reject(err)
+          }
         })
         streamReader.pipe(hash)
-      } catch (err) { reject(err) }
+      } catch (err) {
+        reject(err)
+      }
     })
   },
 
@@ -51,9 +55,11 @@ const tools = {
 
   getExifDate(exif) {
     if (exif) {
-      const createDate = _.get(exif, ['tags', 'CreateDate'])
-      const dateTimeOriginal = _.get(exif, ['tags', 'DateTimeOriginal'])
-      const modifyDate = _.get(exif, ['tags', 'ModifyDate'])
+      const { tags } = exif || {}
+      const { CreateDate: createDate, DateTimeOriginal: dateTimeOriginal, ModifyDate: modifyDate } = tags || {}
+      // const createDate = _.get(exif, ['tags', 'CreateDate'])
+      // const dateTimeOriginal = _.get(exif, ['tags', 'DateTimeOriginal'])
+      // const modifyDate = _.get(exif, ['tags', 'ModifyDate'])
 
       const CreateDate = createDate ? DateTime.fromMillis(createDate * 1000, { zone: 'UTC' }) : null
       const DateTimeOriginal = dateTimeOriginal ? DateTime.fromMillis(dateTimeOriginal * 1000, { zone: 'UTC' }) : null
@@ -63,6 +69,12 @@ const tools = {
     } else {
       return null
     }
+  },
+
+  getExifBirthday(exif) {
+    const { CreateDate, DateTimeOriginal, ModifyDate } = this.getExifDate(exif)
+    const birthday = CreateDate || DateTimeOriginal || ModifyDate
+    return birthday
   },
 }
 module.exports = tools

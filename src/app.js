@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import { logger } from './util/logger'
 import router from './router'
 import middleware from './middleware'
+import ConnectionPool from './orm/index'
 
 const app = express()
 
@@ -35,7 +36,17 @@ Object.values(middleware).forEach((ware) => {
   app.use(ware)
 })
 
-app.use('/', express.static('public'))
+app.locals.connectionPool = new ConnectionPool()
+app.use((req, res, next) => {
+  req.app = app
+  req.getConnection = () => {
+    const connectionPool = req.app.locals.connectionPool
+    const client = connectionPool.getConnection()
+    return client
+  }
+  next()
+})
+// app.use('/', express.static('public'))
 
 Object.keys(router).forEach((k) => {
   app.use(`/${k}`, router[k])

@@ -17,7 +17,8 @@ const authHelper = async (req, res, next) => {
       req.token = tokenStr
       const profile = jwt.decode(tokenStr)
       // logger.debug({ profile })
-      const email = _.get(profile, ['unique_name']) || _.get(profile, ['email']) || ''
+      const email = _.get(profile, ['email']) || ''
+      const uniqueName = _.get(profile, ['unique_name']) || _.get(profile, ['email']) || ''
       const userNt = email.split('@')[0].toLowerCase()
       const givenName = _.get(profile, ['given_name'])
       const familyName = _.get(profile, ['family_name'])
@@ -28,6 +29,7 @@ const authHelper = async (req, res, next) => {
       req.userInfo = {
         profile,
         email,
+        uniqueName,
         userNt,
         userName: `${givenName} ${familyName}`,
         getRoles: async () => {
