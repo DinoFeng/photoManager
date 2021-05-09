@@ -1,4 +1,4 @@
-FROM node:erbium-alpine
+FROM node:erbium
 
 RUN apt-get update -y \
  && apt-get install -y python
