@@ -10,7 +10,7 @@
     "start": "nodemon --exec yarn dev",
     "dev": "cross-env NODE_ENV=local babel-node --inspect src/app.js --inspect-workers",
     "build": "babel src -d dist",
-    "run": "node dist/app.js"
+    "go": "node dist/app.js"
   },
   "dependencies": {
     "chokidar": "^3.5.1",

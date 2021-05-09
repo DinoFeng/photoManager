@@ -16,4 +16,4 @@ RUN yarn install
 RUN yarn build
 
 EXPOSE 10030
-CMD yarn run
+CMD yarn go
