@@ -51,6 +51,10 @@ const PhotoBaseSchema = new EntitySchema({
     size: {
       type: 'int',
     },
+    action: {
+      type: 'text',
+      nullable: true,
+    },
     active: {
       type: 'boolean',
     },

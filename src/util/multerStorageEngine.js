@@ -46,12 +46,12 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
       })
 
       file.stream.pipe(outStream)
-      hashs.forEach(h => file.stream.pipe(h))
+      hashs.forEach((h) => file.stream.pipe(h))
       outStream.on('error', cb)
       outStream.on('finish', () => {
         // const [md5, sha1, sha256, sha512] = await Promise.all(['md5', 'sha1', 'sha256', 'sha512'].map(type => tools.genCrypto(buffer, type)))
-        Promise.all([...hashs.map((h) => h.read()), tools.getExif(buffer), fs.statSync(fullName)]).then(
-          ([md5, sha1, sha256, sha512, exif, stat]) => {
+        Promise.all([...hashs.map((h) => h.read()), tools.getExif(buffer)]).then(
+          ([md5, sha1, sha256, sha512, exif]) => {
             _.merge(file, {
               path: dir,
               fileName,
@@ -62,8 +62,7 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
               sha256,
               sha512,
               exif,
-              buffer,
-              stat,
+              // buffer,
             })
             return this.storageFinish(req, file, (e, file) => {
               if (e) return cb(e)

@@ -7,6 +7,7 @@ import { logger } from './util/logger'
 import router from './router'
 import middleware from './middleware'
 import ConnectionPool from './orm/index'
+import folderWatch from './service/folderWatch'
 
 const app = express()
 
@@ -54,6 +55,7 @@ Object.keys(router).forEach((k) => {
 const port = process.env.PORT || 3000
 app.listen(port, function () {
   logger.info(`App listening on port ${port}!`)
+  folderWatch(new ConnectionPool())
 })
 module.exports = app
 export default app

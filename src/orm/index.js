@@ -1,5 +1,5 @@
 import { createConnection } from 'typeorm'
-// import fs from 'fs'
+import fs from 'fs'
 import path from 'path'
 // import _ from 'lodash'
 import { logger } from '../util/logger'
@@ -13,15 +13,19 @@ import { logger } from '../util/logger'
 //     return require(path.resolve(__dirname, filename))
 //   })
 
+const dbFile = './upload/linex.sqlite.db'
+
 class ConnectionPool {
   constructor() {
     createConnection({
-      type: 'sqlite',
-      database: './upload/line.sqlite.db',
+      type: 'better-sqlite3', // 'sqlite',
+      database: dbFile,
       // entities,
       entities: [path.join(__dirname, '/entity/*.js')],
-      logging: true,
-      // synchronize: true,
+      // logging: true,
+      busyErrorRetry: true,
+      enableWAL: true,
+      synchronize: !fs.existsSync(dbFile),
     }).then((c) => {
       logger.debug('connected.')
       this.connection = c
@@ -30,8 +34,10 @@ class ConnectionPool {
 
   async test() {
     const c = this.connection
-    const runner = c.createQueryRunner()
-    await runner.connect()
+    const r = c.getRepository()
+    r.findOne({})
+    // const runner = c.createQueryRunner()
+    // await runner.connect()
     // runner.manager.save<>({}, { reload: true })
     // const baseRep = c.getRepository('PhotoBase')
     // c.manager.getRepository()

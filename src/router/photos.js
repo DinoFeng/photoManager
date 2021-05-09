@@ -5,12 +5,10 @@ import path from 'path'
 import { DateTime } from 'luxon'
 import { v1 as uuidV1 } from 'uuid'
 import _ from 'lodash'
-import { Not } from 'typeorm'
 
 import PhotoManager from '../service/photoManager'
 import { wrapAsync } from '../util/common'
 import { logger } from '../util/logger'
-import tools from '../util/tools'
 import myStorageEngine from '../util/multerStorageEngine'
 
 const router = express()
@@ -30,8 +28,9 @@ const storage = myStorageEngine({
     cb(null, dest)
   },
   filename: function (req, file, cb) {
-    const extName = path.parse(file.originalname).ext
-    cb(null, `${uuidV1()}${extName}`)
+    const pathInfo = path.parse(file.originalname)
+    const { ext: extName, name } = pathInfo || {}
+    cb(null, `[${name}]${uuidV1()}${extName}`)
   },
   // storageFinish: async function (req, file, cb) {
   //   return cb(null, file)
@@ -57,29 +56,20 @@ const fileFilter = function (req, file, cb) {
 }
 
 const fileOprator = async (connection, file) => {
-  const hashRep = connection.getRepository('PhotoHash')
-  const { hashId, md5, sha1, sha256, sha512, exif } = file
-  const birthday = tools.getExifBirthday(exif)
-  const entity = await hashRep.findOne({ md5, sha1, sha256, sha512, id: Not(hashId) })
-  // 是否有exif birthday
-  if (birthday) {
-    logger.debug(`Birthday is ${birthday}`)
-    if (entity) {
-      // 有相同文件, 移动动
-      logger.debug('Photo already exists.')
-    } else {
-      // 没有相同文件, 移动到按日期分类的目录
-      logger.debug('Photo not exists.')
-    }
-  } else {
-    // don't move
-    // save info to db
+  try {
+    const { file: fileInfo, exception, dbId } = await PhotoManager.manager(connection, rootDir, file)
+    _.merge(file, fileInfo)
+    return { dbId, exception, file }
+  } catch (e) {
+    const { name, message, stack } = e
+    const exception = { name, message, stack }
+    // logger.error('fileOprator error', { name, message, stack })
+    return { exception, file }
   }
 }
 
 // const limits = {}
 const upload = multer({ storage, fileFilter })
-// const upload = multer({ storage })
 
 router.post(
   '/',
@@ -99,59 +89,14 @@ router.post(
     const data = req.body
     const files = req.files
     const c = req.getConnection()
-    // const opraters = files.reduce(async (pre, cur, index) => {
-    //   const res = await fileOprator(c, cur, index)
-    //   pre.push(res)
-    //   return pre
-    // }, [])
-    const opraters = []
+    const operator = []
     for (const file of files) {
-      const res = await PhotoManager.savePhotoFileInfo(c, file)
-      await fileOprator(c, file)
-      opraters.push(res)
+      const r = await fileOprator(c, file)
+      logger.debug('fileOprator result', r)
+      operator.push(r)
     }
-    const xFiles = files.map(
-      ({
-        fileName,
-        stat,
-        path,
-        size,
-        md5,
-        sha1,
-        sha256,
-        sha512,
-        exif,
-        originalname,
-        fieldname,
-        encoding,
-        mimetype,
-        fullName,
-        baseId,
-        exifId,
-        hashId,
-      }) => ({
-        baseId,
-        exifId,
-        hashId,
-        path,
-        fieldname,
-        originalname,
-        mimetype,
-        encoding,
-        size,
-        md5,
-        sha1,
-        sha256,
-        sha512,
-        exif,
-        fileName,
-        stat,
-      }),
-    )
-    return { data, xFiles, opraters }
-    // logger.debug('xx', data)
-    // res.status(200).json(JSON.stringify(data))
-    // res.status(200).json({ data, xFiles })
+    const xFiles = files
+    return { data, xFiles, operator }
   }),
 )
 
