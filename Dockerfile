@@ -1,5 +1,8 @@
 FROM node:erbium-alpine
 
+RUN apt-get update -y \
+ && apt-get install -y python
+
 RUN mkdir -p /usr/src/app 
 
 WORKDIR /usr/src/app
