@@ -8,7 +8,7 @@ COPY . /usr/src/app
 
 VOLUME /usr/src/app/upload
 
-RUN npm install --production
+RUN yarn install
 
 RUN yarn build
 
